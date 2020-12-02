@@ -8,7 +8,11 @@ class PassWordCard:
         self._my_seed = my_seed
         self._number_of_categories = number_of_categories
         self._alphabet = string.ascii_uppercase
-        self._symbols = string.ascii_letters + string.punctuation + string.digits
+        punct_idx =[0,2,3,4,5,7,8,9,10,11,12,13,15,16,18,20,21,22,24,26,28,30] 
+        punctuation = ""
+        for idx, sym in enumerate(list(string.punctuation)):
+            punctuation += sym if idx in punct_idx else ""
+        self._symbols = string.ascii_letters + punctuation + string.digits
         self._master_map = self._make_master_map()
 
     def _category_map(self, current_seed):
@@ -37,7 +41,9 @@ class PassWordCard:
             print("{} : {}".format(key,value))
 
     def export_card(self):
-        latex_header = r"\documentclass[12pt]{article}"+"\n"+r"\usepackage{booktabs}"+"\n"+r"\usepackage{xcolor, colortbl}"+"\n"+r"\newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}"+"\n"+r"\definecolor{Gray}{gray}{0.85}"+"\n"+r"\newcolumntype{g}{>{\columncolor{Gray}}c}"+"\n"+r"\newcolumntype{w}{>{\columncolor{white}}c}"+"\n"+r"\begin{document}"
+        latex_header = r"\documentclass[12pt]{article}"+"\n"+r"\usepackage{booktabs}"+"\n"+r"\usepackage{xcolor, colortbl}"+"\n"
+        latex_header += r"\renewcommand{\familydefault}{\sfdefault}"+"\n"+r"\newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}"+"\n"+r"\definecolor{Gray}{gray}{0.85}"+"\n"
+        latex_header += r"\newcolumntype{g}{>{\columncolor{Gray}}c}"+"\n"+r"\newcolumntype{w}{>{\columncolor{white}}c}"+"\n"+r"\begin{document}"+"\n"
 
         
         latex_symbols = r"{}^&_$%#~"
@@ -59,7 +65,7 @@ class PassWordCard:
                     value_ref.append(item)
             row = key+ " & "  + " & ".join(value_ref)+r"\\"+"\n"
             rows += row
-        table += rows+r"\bottomrule"+"\n"+r"\end{tabular}"+"\n"+r"\end{document}"
+        table += rows+r"\bottomrule"+"\n"+r"\end{tabular}"+"\n"+"\n"+r"\end{document}"
         #print(table)
 
         with open("./card.tex", "w") as table_file:
@@ -73,9 +79,8 @@ class PassWordCard:
 
 
 def main():
-    my_card = PassWordCard("ottavia", 8)
+    my_card = PassWordCard("ottavia", 20)
     my_card.print_card()
-    print(my_card.get_pass_word("master", 5))
     my_card.export_card()
     os.system(r'pdflatex ./card.tex')
     os.system(r'rm -rf ./*.aux ./*.log ./*.tex')
